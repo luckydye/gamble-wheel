@@ -1,7 +1,7 @@
 body {
     background: #1c1c1c;
     overflow: hidden;
-    font-family: sans-serif;
+    font-family: 'Roboto', sans-serif;
 }
 
 main {
@@ -65,4 +65,23 @@ item-editor {
 
 .drawer[open] + gamble-wheel {
     pointer-events: none;
+}
+
+.cp {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    font-size: 12px;
+    opacity: 0.25;
+}
+
+.cp a[href] {
+    text-decoration: none;
+    color: #eee;
+    font-weight: 100;
+}
+
+.cp a[href]:hover {
+    text-decoration: underline;
 }

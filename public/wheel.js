@@ -258,10 +258,13 @@ class GambleWheel extends HTMLElement {
                 }
                 .display {
                     font-size: 24px;
-                    width: 300px;
+                    min-width: 300px;
+                    padding: 0 10px;
                     line-height: 40px;
                     background: #434343;
                     border-radius: 6px;
+                    white-space: nowrap;
+                    text-align: center;
                 }
                 .wheel {
                     transform: rotate(180deg);

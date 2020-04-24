@@ -29,6 +29,9 @@ window.loadSave = function loadSave() {
         globalState = JSON.parse(state);
         console.log('state loaded');
     }
+    if(globalState.repeat > 50) {
+        globalState.repeat = 50;
+    }
     window.dispatchEvent(new Event('state.load'));
     return globalState;
 }

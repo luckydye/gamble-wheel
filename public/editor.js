@@ -127,6 +127,10 @@ class ItemsEditor extends HTMLElement {
             </div>
             <div class="item">
                 <button class="add-btn" @click="${() => {
+                    if(globalState.items.length > 200) {
+                        return;
+                    }
+
                     globalState.items.push({ text: "Empty", color: Math.random() * 255 });
                     saveState();
                     this.render();
@@ -137,8 +141,9 @@ class ItemsEditor extends HTMLElement {
             </div>
             <div class="item">
                 <div>Repeat set:</div>
-                <input type="number" value="${globalState.repeat}" @input="${function(e) {
-                    globalState.repeat = this.valueAsNumber;
+                <input type="number" min="1" max="10" value="${globalState.repeat}" @input="${function(e) {
+                    globalState.repeat = Math.min(Math.max(this.valueAsNumber, 1), 10);
+                    this.value = globalState.repeat;
                     saveState();
                 }}"/>
             </div>

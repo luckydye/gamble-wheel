@@ -298,7 +298,7 @@ class GambleWheel extends HTMLElement {
                     height: 64px;
                     border-radius: 50%;
                     overflow: hidden;
-                    background: url(./logo.jpg);
+                    background: var(--theme-logo);
                     background-size: 64px;
                     z-index: 10000;
                     pointer-events: none;

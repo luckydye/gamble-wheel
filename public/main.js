@@ -12,13 +12,17 @@ window.globalState = {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    const wheel = document.querySelector('gamble-wheel');
     const drawerHandle = document.querySelector('.drawer-handle');
+
     drawerHandle.addEventListener('click', () => {
-        const drawer = drawerHandle.parentNode;
-        if(drawer.hasAttribute('open')) {
-            drawer.removeAttribute('open');
-        } else {
-            drawer.setAttribute('open', '');
+        if(!wheel.turning) {
+            const drawer = drawerHandle.parentNode;
+            if(drawer.hasAttribute('open')) {
+                drawer.removeAttribute('open');
+            } else {
+                drawer.setAttribute('open', '');
+            }
         }
     });
 })

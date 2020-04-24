@@ -286,11 +286,26 @@ class GambleWheel extends HTMLElement {
                 a {
                     opacity: 0.5;
                 }
+                .center-logo {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%) rotate(180deg);
+                    width: 64px;
+                    height: 64px;
+                    border-radius: 50%;
+                    overflow: hidden;
+                    background: url(./logo.jpg);
+                    background-size: 64px;
+                    z-index: 10000;
+                    pointer-events: none;
+                }
             </style>
             <div class="display">
                 ${this.display}
             </div>
             <div class="wheel">
+                <div class="center-logo"></div>
                 ${this.wheel}
             </div>
             <div>

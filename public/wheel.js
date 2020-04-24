@@ -6,7 +6,7 @@ function generateWheelImage(names = [], repeat = 1) {
     const height = 500;
 
     const radius = 200;
-    const centerRadius = 20;
+    const centerRadius = 30;
     const wheelBorder = 3.5;
     const lineWidth = 3.5;
 
@@ -217,7 +217,8 @@ class GambleWheel extends HTMLElement {
         
                     if(state.winner) {
                         this.turning = false;
-                        console.log('winner', state.target);
+                        console.log('winner', state.winner);
+                        this.showWinner(state.winner);
                     }
                 });
             }
@@ -228,6 +229,21 @@ class GambleWheel extends HTMLElement {
 
     connectedCallback() {
         this.render();
+    }
+
+    showWinner(winner) {
+        const winnerDiv = document.createElement('div');
+        winnerDiv.className = "prompt";
+        render(html`
+            <button @click="${() => {
+                winnerDiv.remove();
+            }}">X</button>
+            <div>
+                <div class="label">Winner:</div>
+                <div class="text">${winner.text}</div>
+            </div>
+        `, winnerDiv);
+        document.body.appendChild(winnerDiv);
     }
 
     template() {

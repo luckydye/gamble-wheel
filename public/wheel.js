@@ -2,10 +2,10 @@ import {html, render} from 'https://unpkg.com/lit-html?module';
 
 function generateWheelImage(names = [], repeat = 1) {
 
-    const width = 500;
-    const height = 500;
+    const width = 600;
+    const height = 600;
 
-    const radius = 200;
+    const radius = 250;
     const centerRadius = 30;
     const wheelBorder = 3.5;
     const lineWidth = 3.5;

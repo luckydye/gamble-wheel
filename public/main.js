@@ -1,7 +1,7 @@
 import './editor.js';
 import './wheel.js';
 
-window.globalState = {
+window.globalState = window.globalState || {
     repeat: 1,
     items: [
         { text: "Option 1", color: 1 },

@@ -205,7 +205,9 @@ class GambleWheel extends HTMLElement {
     setWheel() {
         this.wheel = generateWheelImage(globalState.items, globalState.repeat);
 
-        this.wheel.addEventListener('click', () => {
+        const wheel = this.shadowRoot.querySelector('.wheel');
+
+        wheel.addEventListener('click', () => {
             if(!this.turning) {
                 this.turning = true;
 
@@ -270,10 +272,12 @@ class GambleWheel extends HTMLElement {
                     transform: rotate(180deg);
                     position: relative;
                     z-index: 100;
+                    overflow: hidden;
                 }
                 .wheel::after {
                     content: "";
                     position: absolute;
+                    z-index: 1000;
                     left: 50%;
                     bottom: 32px;
                     height: 30px;
@@ -300,8 +304,12 @@ class GambleWheel extends HTMLElement {
                     overflow: hidden;
                     background: var(--theme-logo);
                     background-size: 64px;
-                    z-index: 10000;
+                    z-index: 1000;
                     pointer-events: none;
+                }
+                canvas {
+                    position: relative;
+                    z-index: -1;
                 }
             </style>
             <div class="display">

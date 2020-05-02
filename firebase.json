@@ -8,10 +8,6 @@
     ],
     "rewrites": [
       {
-        "source": "/wheel",
-        "destination": "/wheel/index.html"
-      },
-      {
         "source": "**",
         "destination": "/index.html"
       }

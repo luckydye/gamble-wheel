@@ -19,8 +19,8 @@ class ItemsEditor extends HTMLElement {
     }
 
     template() {
-        const repeat = globalState.repeat;
         const items = globalState.items;
+        const self = this;
 
         return html`
             <style>
@@ -32,6 +32,28 @@ class ItemsEditor extends HTMLElement {
                     color: white;
                     box-shadow: 1px 2px 12px rgba(0, 0, 0, 0.4);
                 }
+                
+                ::-webkit-scrollbar {
+                    width: 10px;
+                    margin: 0 4px;
+                    margin-left: 2px;
+                }
+                ::-webkit-scrollbar-button {
+                    display: none;
+                }
+                ::-webkit-scrollbar-track-piece  {
+                    background: transparent;
+                }
+                ::-webkit-scrollbar-thumb {
+                    background: #333333;
+                    border-radius: 5px;
+                }
+                ::-webkit-scrollbar-thumb:hover {
+                    background: #4e4e4e;
+                }
+                ::-webkit-scrollbar-corner {
+                    background: transparent;
+                }
 
                 h3 {
                     margin: 0;
@@ -42,6 +64,7 @@ class ItemsEditor extends HTMLElement {
                     height: 450px;
                     width: 320px;
                     overflow: auto;
+                    padding: 0 10px 0 0;
                 }
 
                 input {
@@ -61,6 +84,16 @@ class ItemsEditor extends HTMLElement {
 
                 .name-input {
                     width: 100%;
+                    margin-right: 10px;
+                }
+
+                .factor-input {
+                    width: 50px;
+                    margin-right: 5px;
+                    text-align: center;
+                }
+
+                .factor-input-sufix {
                     margin-right: 10px;
                 }
 
@@ -98,9 +131,18 @@ class ItemsEditor extends HTMLElement {
                     background: #2f2f2f;
                 }
 
+                .del-btn {
+                    width: 50px;
+                }
+
                 .add-btn {
                     margin: 10px 0;
                     width: 100%;
+                }
+
+                .item.sum {
+                    padding: 10px;
+                    margin: 0;
                 }
             </style>
             <div class="item header">
@@ -113,11 +155,16 @@ class ItemsEditor extends HTMLElement {
                             <input class="name-input" value="${item.text}" @input="${function(e) {
                                 item.text = this.value;
                                 saveState();
+                                self.render();
                             }}"/>
+                            <input class="factor-input" value="${item.factor}" @input="${function(e) {
+                                item.factor = this.value;
+                                saveState();
+                                self.render();
+                            }}"/><span class="factor-input-sufix">%</span>
                             <button class="del-btn" @click="${() => {
                                 const index = globalState.items.indexOf(item);
                                 globalState.items.splice(index, 1);
-
                                 saveState();
                                 this.render();
                             }}">-</button>
@@ -125,27 +172,28 @@ class ItemsEditor extends HTMLElement {
                     `;
                 })}
             </div>
+            <div class="item sum">
+                <span>Probability sum:</span>
+                <span data="${globalState.items.length}">
+                    ${globalState.items.reduce((accumulator, item) => {
+                        const factor = +item.factor;
+                        return accumulator + factor;
+                    }, 0)}%
+                </span>
+            </div>
             <div class="item">
                 <button class="add-btn" @click="${() => {
                     if(globalState.items.length > 200) {
                         return;
                     }
 
-                    globalState.items.push({ text: "Empty", color: Math.random() * 255 });
+                    globalState.items.push({ text: "Empty", factor: 0, color: Math.random() * 255 });
                     saveState();
                     this.render();
 
                     const listElem = this.shadowRoot.querySelector('.items-list');
                     listElem.scrollTo(0, listElem.scrollHeight);
                 }}">+</button>
-            </div>
-            <div class="item">
-                <div>Repeat set:</div>
-                <input type="number" min="1" max="10" value="${globalState.repeat}" @input="${function(e) {
-                    globalState.repeat = Math.min(Math.max(this.valueAsNumber, 1), 10);
-                    this.value = globalState.repeat;
-                    saveState();
-                }}"/>
             </div>
         `;
     }

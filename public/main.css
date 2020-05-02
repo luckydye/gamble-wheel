@@ -87,7 +87,7 @@ item-editor {
 }
 
 .prompt {
-    position: fixed;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -129,4 +129,22 @@ item-editor {
     justify-content: center;
     align-items: center;
     border-radius: 50%;
+}
+
+.animated-background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+gamble-wheel {
+    transition: transform .2s ease-out;
+}
+
+body[open] gamble-wheel {
+    transform: translateX(-33%);
 }

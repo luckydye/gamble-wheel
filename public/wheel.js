@@ -1,6 +1,6 @@
-import {html, render} from 'https://unpkg.com/lit-html?module';
+import { html, render } from 'https://unpkg.com/lit-html?module';
 
-function generateWheelImage(names = [], repeat = 1) {
+function generateWheelImage(names = []) {
 
     const width = 600;
     const height = 600;
@@ -20,7 +20,6 @@ function generateWheelImage(names = [], repeat = 1) {
 
     const font = "16px Roboto, Arial";
 
-
     const canvas = document.createElement('canvas');
     const context = canvas.getContext("2d");
 
@@ -39,13 +38,18 @@ function generateWheelImage(names = [], repeat = 1) {
     context.fill();
 
     // sections
-    const sectionsCount = names.length * repeat;
+    names = [...names].reverse();
+    const sectionsCount = names.length;
     const steps = (Math.PI * 2) / sectionsCount;
 
+    let angleOffset = 0;
+
     for(let i = 0; i < sectionsCount; i++) {
-        const a = (Math.PI / 2) - (i * steps);
         const item = names[i % names.length];
 
+        const angel = (Math.PI * 2) * (item.factor / 100);
+        let a = angleOffset + angel;
+        
         context.strokeStyle = borderColor;
         context.fillStyle = `hsl(${item.color}, 50%, 50%)`;
         context.lineWidth = lineWidth;
@@ -60,7 +64,7 @@ function generateWheelImage(names = [], repeat = 1) {
             center[0], 
             center[1], 
             radius, 
-            a, a + steps
+            angleOffset, a
         );
         context.lineTo(
             center[0], 
@@ -69,18 +73,14 @@ function generateWheelImage(names = [], repeat = 1) {
 
         context.stroke();
         context.fill();
-    }
 
-    // text
-    for(let i = 0; i < sectionsCount; i++) {
-        const a = (Math.PI / 2) - (i * steps) + (steps / 2);
-        const item = names[i % names.length];
+        const textAngle = angleOffset + angel - (angel / 2);
 
         context.translate(
-            center[0] + Math.cos(a) * radius, 
-            center[1] + Math.sin(a) * radius
+            center[0] + Math.cos(textAngle) * radius, 
+            center[1] + Math.sin(textAngle) * radius
         );
-        context.rotate(a);
+        context.rotate(textAngle);
 
         context.fillStyle = textColor;
 
@@ -91,6 +91,8 @@ function generateWheelImage(names = [], repeat = 1) {
         context.fillText(formatedText, -textOffset, 0);
         
         context.resetTransform();
+        
+        angleOffset += angel;
     }
 
     context.beginPath();
@@ -103,6 +105,19 @@ function generateWheelImage(names = [], repeat = 1) {
 }
 
 function turnWheel(wheel, itemsState, updateCallback = () => {}) {
+
+    const selectionArray = new Array(100);
+    let currentIndex = 0;
+
+    for(let item of itemsState.items) {
+        const cellAmount = +item.factor;
+
+        for(let i = 0; i < cellAmount; i++) {
+            selectionArray[currentIndex + i] = item;
+        }
+
+        currentIndex += cellAmount;
+    }
 
     const startTime = Date.now();
     const tickrate = 1000 / 144;
@@ -117,6 +132,8 @@ function turnWheel(wheel, itemsState, updateCallback = () => {}) {
         target: itemsState.items[0],
         winner: null,
     }
+
+    console.log('energy:', state.velocity);
 
     let lastFrame, accumulator = 0;
 
@@ -157,13 +174,14 @@ function turnWheel(wheel, itemsState, updateCallback = () => {}) {
         state.velocity *= 1 - drag;
 
         const items = itemsState.items;
-        const itemsCount = items.length;
+        const itemsCount = 100;
 
         const wheelFraction = state.angle / 360;
-        const itemFraction = wheelFraction * (itemsCount * itemsState.repeat);
+        const itemFraction = wheelFraction * 100;
 
-        const itemIndex = Math.floor(itemFraction + 1) % items.length;
-        const target = items[itemIndex];
+        const itemIndex = Math.floor(itemFraction + 1) % 100;
+
+        const target = selectionArray[itemIndex];
 
         if(state.target != target) {
             state.target = target;
@@ -174,7 +192,7 @@ function turnWheel(wheel, itemsState, updateCallback = () => {}) {
 
     const draw = () => {
         if(wheel) {
-            wheel.style.transform = `rotate(${state.angle}deg)`;
+            wheel.style.transform = `rotate(${state.angle - 86}deg)`;
         }
     }
 
@@ -203,7 +221,7 @@ class GambleWheel extends HTMLElement {
     }
 
     setWheel() {
-        this.wheel = generateWheelImage(globalState.items, globalState.repeat);
+        this.wheel = generateWheelImage(globalState.items);
 
         const wheel = this.shadowRoot.querySelector('.wheel');
 
@@ -245,6 +263,67 @@ class GambleWheel extends HTMLElement {
                 <div class="text">${winner.text}</div>
             </div>
         `, winnerDiv);
+
+        const cvs = document.querySelector('.animated-background');
+        const ctx = cvs.getContext("2d");
+
+        cvs.width = window.innerWidth;
+        cvs.height = window.innerHeight;
+
+        const particles = [];
+        let lastTick = 0;
+
+        const updateCanvas = (ms = 0) => {
+            const currentTick = performance.now();
+            const delta = currentTick - lastTick;
+
+            ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+            let alife = 0;
+
+            for(let particle of particles) {
+                ctx.fillStyle = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+                ctx.fillRect(particle.x, particle.y, 4, 4);
+
+                particle.x += particle.velocity[0];
+                particle.y += particle.velocity[1];
+
+                if(particle.y < cvs.height + 5) {
+                    alife += 1;
+                }
+
+                particle.velocity[0] *= 0.99;
+                particle.velocity[1] *= 0.99;
+
+                particle.velocity[1] += 0.025;
+
+                particle.life++;
+            }
+
+            if(alife > 0) {
+                requestAnimationFrame(updateCanvas);
+            } else {
+                ctx.clearRect(0, 0, cvs.width, cvs.height);
+            }
+
+            lastTick = currentTick;
+        }
+
+        
+        for(let i = 0; i < 500; i++) {
+            const a = Math.random() * (Math.PI * 2);
+            particles.push({ 
+                x: cvs.width / 2,
+                y: cvs.height / 2, 
+                velocity: [
+                    Math.sin(a) * (Math.random() * 7),
+                    Math.cos(a) * (Math.random() * 8),
+                ],
+                life: 0
+            });
+        }
+        updateCanvas();
+
         document.body.appendChild(winnerDiv);
     }
 
@@ -269,7 +348,6 @@ class GambleWheel extends HTMLElement {
                     text-align: center;
                 }
                 .wheel {
-                    transform: rotate(180deg);
                     position: relative;
                     z-index: 100;
                     overflow: hidden;
@@ -279,16 +357,16 @@ class GambleWheel extends HTMLElement {
                     position: absolute;
                     z-index: 1000;
                     left: 50%;
-                    bottom: 32px;
+                    top: 30px;
                     height: 30px;
                     width: 4px;
                     background: white;
                     border-radius: 4px;
                     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-                    transform: translate(-65%, 0);
+                    transform: translate(-50%, 0);
                 }
                 .wheel:active {
-                    transform: rotate(180deg) scale(0.995);
+                    transform: scale(0.995);
                 }
                 a {
                     opacity: 0.5;
@@ -297,7 +375,7 @@ class GambleWheel extends HTMLElement {
                     position: absolute;
                     top: 50%;
                     left: 50%;
-                    transform: translate(-50%, -50%) rotate(180deg);
+                    transform: translate(-50%, -50%);
                     width: 64px;
                     height: 64px;
                     border-radius: 50%;
@@ -318,9 +396,6 @@ class GambleWheel extends HTMLElement {
             <div class="wheel">
                 <div class="center-logo"></div>
                 ${this.wheel}
-            </div>
-            <div>
-                <a>Click to turn.</a>
             </div>
         `;
     }

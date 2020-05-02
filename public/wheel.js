@@ -97,9 +97,11 @@ function generateWheelImage(names = []) {
 
     context.beginPath();
 
-    context.fillStyle = centerColor;
-    context.arc(center[0], center[1], centerRadius, 0, Math.PI * 2);
-    context.fill();
+    const image = new Image();
+    image.src = "./logo.png";
+    image.onload = () => {
+        context.drawImage(image, center[0] - (75 / 2), center[1] - (75 / 2), 75, 75);
+    }
 
     return canvas;
 }
@@ -371,20 +373,6 @@ class GambleWheel extends HTMLElement {
                 a {
                     opacity: 0.5;
                 }
-                .center-logo {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    width: 64px;
-                    height: 64px;
-                    border-radius: 50%;
-                    overflow: hidden;
-                    background: var(--theme-logo);
-                    background-size: 64px;
-                    z-index: 1000;
-                    pointer-events: none;
-                }
                 canvas {
                     position: relative;
                     z-index: -1;
@@ -394,7 +382,6 @@ class GambleWheel extends HTMLElement {
                 ${this.display}
             </div>
             <div class="wheel">
-                <div class="center-logo"></div>
                 ${this.wheel}
             </div>
         `;

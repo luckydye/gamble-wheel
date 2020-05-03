@@ -211,7 +211,6 @@ export default class FluidInput extends HTMLElement {
 		const cancel = () => {
             startPos = null;
             startMovePos = null;
-            focused = false;
             this.input.removeAttribute('active');
 		}
 		const up = e => {
@@ -335,11 +334,11 @@ export default class FluidInput extends HTMLElement {
         }
 
         const getPrecision = (n) => {
-            const precParts = n.toString().split(".");
+            const precParts = n.toFixed(3).split(".");
             const size = precParts[1] ? precParts[1].length : 0;
-            
+
             // return 0 if precision is smaller then .000
-            if(precParts[1] && precParts[1].substring(0, Math.min(size, 3)) == "000") {
+            if(precParts[1] && precParts[1].substring(0, 3) == "000") {
                 return 0;
             }
 

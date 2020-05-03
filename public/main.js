@@ -250,6 +250,12 @@ window.addEventListener('DOMContentLoaded', () => {
     const drawerHandle = document.querySelector('.drawer-handle');
 
     wheel.addEventListener('finished', e => {
+        if(e.winner.text.toLocaleLowerCase().match('roll')) {
+            wheel.style.animation = "roll 1s ease";
+            wheel.onanimationend = () => {
+                wheel.style.animation = "";
+            }
+        }
         winnerAnimation(e.winner);
     });
 

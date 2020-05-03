@@ -181,7 +181,7 @@ class ItemsEditor extends HTMLElement {
                             <gyro-fluid-input 
                                 title="Probability" 
                                 class="factor-input" 
-                                min="0" max="50" 
+                                min="0" max="100" 
                                 suffix="%" 
                                 value="${item.factor}" 
                                 steps="0.001" 

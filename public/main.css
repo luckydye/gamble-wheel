@@ -148,3 +148,14 @@ gamble-wheel {
 body[open] gamble-wheel {
     transform: translateX(-33%);
 }
+
+@keyframes roll {
+
+    from {
+        transform: perspective(100vw) rotateX(0deg);  
+    }
+    to {
+        transform: perspective(100vw) rotateX(-360deg);
+    }
+
+}

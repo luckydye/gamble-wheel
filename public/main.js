@@ -108,7 +108,7 @@ async function fetchAllEmotes() {
     const twitchEmotes = await fetch(url2).then(res => res.json());
 
     const twitchEmote = (id) => {
-        const url = `http://static-cdn.jtvnw.net/emoticons/v1/${id}/2.0`;
+        const url = `https://static-cdn.jtvnw.net/emoticons/v1/${id}/2.0`;
         const img = new Image();
         img.onload = () => {
             emoteAsImages.push(img);

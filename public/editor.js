@@ -167,7 +167,7 @@ class ItemsEditor extends HTMLElement {
                 }
             </style>
             <div class="item header">
-                <h3>Fields</h3>
+                <h3>Fields (${globalState.items.length})</h3>
             </div>
             <div class="items-list">
                 ${items.map(item => {

@@ -191,11 +191,18 @@ function turnWheel(wheel, itemsState, updateCallback = () => {}) {
 
     const draw = () => {
         if(wheel) {
-            wheel.style.transform = `rotate(${state.angle - 90}deg)`;
+            wheel.style.transform = `rotate(${state.angle - 89.5}deg)`;
         }
     }
 
     animate();
+}
+
+class WheelWinnerEvent extends Event {
+    constructor(winner) {
+        super('finished');
+        this.winner = winner;
+    }
 }
 
 class GambleWheel extends HTMLElement {
@@ -238,6 +245,8 @@ class GambleWheel extends HTMLElement {
                         this.turning = false;
                         console.log('winner', state.winner);
                         this.showWinner(state.winner);
+
+                        this.dispatchEvent(new WheelWinnerEvent(state.winner));
                     }
                 });
             }
@@ -262,66 +271,6 @@ class GambleWheel extends HTMLElement {
                 <div class="text">${winner.text}</div>
             </div>
         `, winnerDiv);
-
-        const cvs = document.querySelector('.animated-background');
-        const ctx = cvs.getContext("2d");
-
-        cvs.width = window.innerWidth;
-        cvs.height = window.innerHeight;
-
-        const particles = [];
-        let lastTick = 0;
-
-        const updateCanvas = (ms = 0) => {
-            const currentTick = performance.now();
-            const delta = currentTick - lastTick;
-
-            ctx.clearRect(0, 0, cvs.width, cvs.height);
-
-            let alife = 0;
-
-            for(let particle of particles) {
-                ctx.fillStyle = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
-                ctx.fillRect(particle.x, particle.y, 4, 4);
-
-                particle.x += particle.velocity[0];
-                particle.y += particle.velocity[1];
-
-                if(particle.y < cvs.height + 5) {
-                    alife += 1;
-                }
-
-                particle.velocity[0] *= 0.99;
-                particle.velocity[1] *= 0.99;
-
-                particle.velocity[1] += 0.025;
-
-                particle.life++;
-            }
-
-            if(alife > 0) {
-                requestAnimationFrame(updateCanvas);
-            } else {
-                ctx.clearRect(0, 0, cvs.width, cvs.height);
-            }
-
-            lastTick = currentTick;
-        }
-
-        
-        for(let i = 0; i < 500; i++) {
-            const a = Math.random() * (Math.PI * 2);
-            particles.push({ 
-                x: cvs.width / 2,
-                y: cvs.height / 2, 
-                velocity: [
-                    Math.sin(a) * (Math.random() * 7),
-                    Math.cos(a) * (Math.random() * 8),
-                ],
-                life: 0
-            });
-        }
-        updateCanvas();
 
         document.body.appendChild(winnerDiv);
     }

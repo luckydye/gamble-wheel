@@ -1,5 +1,8 @@
 import { html, render } from 'https://unpkg.com/lit-html?module';
 
+const image = new Image();
+image.src = "./logo.png";
+
 function generateWheelImage(names = []) {
 
     const width = 600;
@@ -97,10 +100,12 @@ function generateWheelImage(names = []) {
 
     context.beginPath();
 
-    const image = new Image();
-    image.src = "./logo.png";
-    image.onload = () => {
+    if(image.complete) {
         context.drawImage(image, center[0] - (75 / 2), center[1] - (75 / 2), 75, 75);
+    } else {
+        image.onload = () => {
+            context.drawImage(image, center[0] - (75 / 2), center[1] - (75 / 2), 75, 75);
+        }
     }
 
     return canvas;

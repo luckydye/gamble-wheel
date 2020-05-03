@@ -8,10 +8,10 @@ function generateWheelImage(names = []) {
     const width = 600;
     const height = 600;
 
-    const radius = 250;
-    const centerRadius = 30;
-    const wheelBorder = 3.5;
-    const lineWidth = 3.5;
+    const radius = 270;
+    const centerRadius = 45;
+    const wheelBorder = 2;
+    const lineWidth = 2.5;
 
     const textOffset = 10;
     
@@ -104,11 +104,13 @@ function generateWheelImage(names = []) {
 
     context.beginPath();
 
+    const centerImageSize = centerRadius * 2;
+
     if(image.complete) {
-        context.drawImage(image, center[0] - (75 / 2), center[1] - (75 / 2), 75, 75);
+        context.drawImage(image, center[0] - (centerImageSize / 2), center[1] - (centerImageSize / 2), centerImageSize, centerImageSize);
     } else {
         image.onload = () => {
-            context.drawImage(image, center[0] - (75 / 2), center[1] - (75 / 2), 75, 75);
+            context.drawImage(image, center[0] - (centerImageSize / 2), center[1] - (centerImageSize / 2), centerImageSize, centerImageSize);
         }
     }
 
@@ -195,7 +197,7 @@ function turnWheel(wheel, itemsState, updateCallback = () => {}) {
 
     const draw = () => {
         if(wheel) {
-            wheel.style.transform = `rotate(${state.angle - 89.5}deg)`;
+            wheel.style.transform = `rotate(${state.angle - 90.125}deg)`;
         }
     }
 
@@ -309,7 +311,7 @@ class GambleWheel extends HTMLElement {
                     position: absolute;
                     z-index: 1000;
                     left: 50%;
-                    top: 30px;
+                    top: 20px;
                     height: 30px;
                     width: 4px;
                     background: white;

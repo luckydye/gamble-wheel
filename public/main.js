@@ -203,7 +203,7 @@ function winnerAnimation(winner) {
             if(freeze && deltaTime > 1000) {
                 setTimeout(() => {
                     ctx.clearRect(0, 0, cvs.width, cvs.height);
-                }, 1000 * 10);
+                }, 1000 * 5);
             } else {
                 requestAnimationFrame(updateCanvas);
             }

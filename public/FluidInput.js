@@ -69,11 +69,11 @@ export default class FluidInput extends HTMLElement {
                     justify-content: center;
                     border: none;
                     background: transparent;
-                    margin: 0;
-                    width: calc(100% - 30px);
+                    margin: 0 -10px;
+                    width: auto;
                     padding: 0;
                     color: inherit;
-                    font-faily: inherit;
+                    font-family: inherit;
                     font-size: inherit;
                     text-align: center;
                 }
@@ -211,6 +211,7 @@ export default class FluidInput extends HTMLElement {
 		const cancel = () => {
             startPos = null;
             startMovePos = null;
+            focused = false;
             this.input.removeAttribute('active');
 		}
 		const up = e => {
@@ -290,7 +291,7 @@ export default class FluidInput extends HTMLElement {
         this.inputValue.addEventListener('blur', submit);
         this.inputValue.addEventListener('keydown', input);
 
-		this.inputValue.addEventListener('mousedown', start);
+		this.input.addEventListener('mousedown', start);
 		window.addEventListener('mousemove', move);
 
 		window.addEventListener('mouseup', up);
@@ -335,7 +336,14 @@ export default class FluidInput extends HTMLElement {
 
         const getPrecision = (n) => {
             const precParts = n.toString().split(".");
-            return precParts[1] ? precParts[1].length : 0;
+            const size = precParts[1] ? precParts[1].length : 0;
+            
+            // return 0 if precision is smaller then .000
+            if(precParts[1] && precParts[1].substring(0, Math.min(size, 3)) == "000") {
+                return 0;
+            }
+
+            return size;
         }
 
         const valuePrecision = getPrecision(this.value);
@@ -344,6 +352,7 @@ export default class FluidInput extends HTMLElement {
         const precision = valuePrecision > stepsPrecision ? stepsPrecision : valuePrecision;
 
         this.inputValue.value = this.value.toFixed(precision);
+        this.inputValue.size = this.inputValue.value.length;
 	}
 
 	setValue(value) {

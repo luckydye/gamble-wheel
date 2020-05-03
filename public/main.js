@@ -106,7 +106,7 @@ window.loadSave = function loadSave() {
 
 window.saveState = function saveState() {
     localStorage.setItem('wheel-state', JSON.stringify(globalState));
-    console.log('state saved');
+    // console.log('state saved');
     window.dispatchEvent(new Event('state.save'));
     return true;
 }

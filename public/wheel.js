@@ -104,15 +104,9 @@ function generateWheelImage(names = []) {
 
     context.beginPath();
 
-    const centerImageSize = centerRadius * 2;
-
-    if(image.complete) {
-        context.drawImage(image, center[0] - (centerImageSize / 2), center[1] - (centerImageSize / 2), centerImageSize, centerImageSize);
-    } else {
-        image.onload = () => {
-            context.drawImage(image, center[0] - (centerImageSize / 2), center[1] - (centerImageSize / 2), centerImageSize, centerImageSize);
-        }
-    }
+    context.fillStyle = "#fff";
+    context.arc(center[0], center[1], centerRadius, 0, Math.PI * 2);
+    context.fill();
 
     return canvas;
 }

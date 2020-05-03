@@ -23,7 +23,7 @@ item-editor {
 
 .drawer {
     position: fixed;
-    right: 10px;
+    right: 20px;
     z-index: 1000;
     transition: transform .2s ease-out;
 }

@@ -50,28 +50,10 @@ loadSave();
 // main
 
 async function fetchAllEmotes() {
-    const url = `https://api.frankerfacez.com/v1/room/bintokki`;
-
+    const url = `https://api.frankerfacez.com/v1/room/lirik`;
     const json = await fetch(url).then(res => res.json());
 
-    const url2 = `https://api.twitchemotes.com/api/v4/channels/${json.room.twitch_id}`;
-    const twitchEmotes = await fetch(url2).then(res => res.json());
-
-    const twitchEmote = (id) => {
-        const url = `https://static-cdn.jtvnw.net/emoticons/v1/${id}/2.0`;
-        const img = new Image();
-        img.onload = () => {
-            emoteAsImages.push(img);
-        }
-        img.src = url;
-        return img;
-    }
-
     const emoteAsImages = [];
-    
-    for(let emote of twitchEmotes.emotes) {
-        emoteAsImages.push(twitchEmote(emote.id));
-    }
 
     const emoticons = json.sets[Object.keys(json.sets)[0]].emoticons;
 
@@ -113,11 +95,8 @@ function winnerAnimation(winner) {
         ctx.globalAlpha = 0.7;
 
         let alife = 0;
-        let freeze = false;
 
         for(let particle of particles) {
-
-            freeze = particle.freeze;
 
             ctx.save();
 
@@ -149,25 +128,12 @@ function winnerAnimation(winner) {
         }
 
         if(alife > 0) {
-
-            if(freeze && deltaTime > 1000) {
-                setTimeout(() => {
-                    ctx.clearRect(0, 0, cvs.width, cvs.height);
-                }, 1000 * 5);
-            } else {
-                requestAnimationFrame(updateCanvas);
-            }
-
+            requestAnimationFrame(updateCanvas);
         } else {
             ctx.clearRect(0, 0, cvs.width, cvs.height);
         }
 
         lastTick = currentTick;
-    }
-
-    let freeze = 0;
-    if(winner.text.toLocaleLowerCase().match('freeze')) {
-        freeze = 1;
     }
     
     for(let i = 0; i < 500; i++) {
@@ -184,7 +150,6 @@ function winnerAnimation(winner) {
             y: cvs.height / 2, 
             rotation: Math.random() * (Math.PI * 2),
             size: Math.random() * 20 + 20,
-            freeze: freeze,
             velocity: [
                 Math.sin(a) * (Math.random() * 7),
                 Math.cos(a) * (Math.random() * 3) - 4,

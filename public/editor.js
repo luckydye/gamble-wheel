@@ -1,4 +1,5 @@
 import {html, render} from 'https://unpkg.com/lit-html?module';
+import './FluidInput.js';
 
 class ItemsEditor extends HTMLElement {
 
@@ -62,9 +63,10 @@ class ItemsEditor extends HTMLElement {
 
                 .items-list {
                     height: 450px;
-                    width: 320px;
+                    width: 340px;
                     overflow: auto;
                     padding: 0 10px 0 0;
+                    margin-right: -10px;
                 }
 
                 input {
@@ -84,17 +86,17 @@ class ItemsEditor extends HTMLElement {
 
                 .name-input {
                     width: 100%;
-                    margin-right: 10px;
+                    margin-right: 5px;
                 }
 
                 .factor-input {
-                    width: 50px;
+                    --color-input-background: #353535;
+                    --color-input-hover-background: #393939;
+                    --color-input-active-background: #2f2f2f;
+                    height: 34px;
+                    min-width: 90px;
                     margin-right: 5px;
                     text-align: center;
-                }
-
-                .factor-input-sufix {
-                    margin-right: 10px;
                 }
 
                 .item {
@@ -157,11 +159,11 @@ class ItemsEditor extends HTMLElement {
                                 saveState();
                                 self.render();
                             }}"/>
-                            <input class="factor-input" value="${item.factor}" @input="${function(e) {
+                            <gyro-fluid-input class="factor-input" min="0" max="50" suffix="%" value="${item.factor}" steps="0.001" @change="${function(e) {
                                 item.factor = this.value;
                                 saveState();
                                 self.render();
-                            }}"/><span class="factor-input-sufix">%</span>
+                            }}"></gyro-fluid-input>
                             <button class="del-btn" @click="${() => {
                                 const index = globalState.items.indexOf(item);
                                 globalState.items.splice(index, 1);
@@ -178,7 +180,7 @@ class ItemsEditor extends HTMLElement {
                     ${globalState.items.reduce((accumulator, item) => {
                         const factor = +item.factor;
                         return accumulator + factor;
-                    }, 0)}%
+                    }, 0).toFixed(2)}%
                 </span>
             </div>
             <div class="item">

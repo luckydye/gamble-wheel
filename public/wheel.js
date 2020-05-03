@@ -311,7 +311,7 @@ class GambleWheel extends HTMLElement {
                     position: absolute;
                     z-index: 1000;
                     left: 50%;
-                    top: 20px;
+                    top: 3%;
                     height: 30px;
                     width: 4px;
                     background: white;
@@ -328,6 +328,7 @@ class GambleWheel extends HTMLElement {
                 canvas {
                     position: relative;
                     z-index: -1;
+                    width: 100%;
                 }
             </style>
             <div class="display">

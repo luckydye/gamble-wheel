@@ -19,6 +19,13 @@ class ItemsEditor extends HTMLElement {
         }
     }
 
+    getFactorSum() {
+        return globalState.items.reduce((accumulator, item) => {
+            const factor = +item.factor;
+            return accumulator + factor;
+        }, 0);
+    }
+
     template() {
         const items = globalState.items;
         const self = this;
@@ -160,9 +167,14 @@ class ItemsEditor extends HTMLElement {
                                 self.render();
                             }}"/>
                             <gyro-fluid-input class="factor-input" min="0" max="50" suffix="%" value="${item.factor}" steps="0.001" @change="${function(e) {
-                                item.factor = this.value;
-                                saveState();
-                                self.render();
+                                if(self.getFactorSum() > 100) {
+                                    item.factor = this.value - (self.getFactorSum() - 100);
+                                    this.setValue(item.factor);
+                                } else {
+                                    item.factor = this.value;
+                                    saveState();
+                                    self.render();
+                                }
                             }}"></gyro-fluid-input>
                             <button class="del-btn" @click="${() => {
                                 const index = globalState.items.indexOf(item);
@@ -177,10 +189,7 @@ class ItemsEditor extends HTMLElement {
             <div class="item sum">
                 <span>Probability sum:</span>
                 <span data="${globalState.items.length}">
-                    ${globalState.items.reduce((accumulator, item) => {
-                        const factor = +item.factor;
-                        return accumulator + factor;
-                    }, 0).toFixed(2)}%
+                    ${this.getFactorSum().toFixed(2)}%
                 </span>
             </div>
             <div class="item">

@@ -347,19 +347,28 @@ export default class FluidInput extends HTMLElement {
 	}
 
 	setValue(value) {
+        const latValue = this.value;
+
         if(this.isRange) {
             this.value = Math.min(Math.max(value, this.min), this.max);
         } else {
             this.value = value;
         }
 
-		this.dispatchEvent(new Event('change'));
+        this.dispatchEvent(new InputChangeEvent(this.value - latValue));
 	}
 
 	render() {
 		render(this.template(), this.shadowRoot);
 	}
 
+}
+
+class InputChangeEvent extends Event {
+    constructor(delta) {
+        super('change');
+        this.delta = delta;
+    }
 }
 
 customElements.define("gyro-fluid-input", FluidInput);

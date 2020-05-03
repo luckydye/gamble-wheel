@@ -31,6 +31,7 @@ class ItemsEditor extends HTMLElement {
         const self = this;
 
         return html`
+            <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
             <style>
                 :host {
                     padding: 20px;
@@ -65,7 +66,8 @@ class ItemsEditor extends HTMLElement {
 
                 h3 {
                     margin: 0;
-                    font-weight: 400;
+                    text-transform: uppercase;
+                    font-weight: 300;
                 }
 
                 .items-list {
@@ -150,44 +152,63 @@ class ItemsEditor extends HTMLElement {
                 }
 
                 .item.sum {
-                    padding: 10px;
+                    padding: 10px 60px 10px 10px;
                     margin: 0;
+                }
+
+                .item.sum a {
+                    opacity: 0.5;
+                    font-weight: 300;
+                }
+
+                .material-icons {
+                    font-size: 18px;
+                    color: #eee;
                 }
             </style>
             <div class="item header">
-                <h3>Wheel Set</h3>
+                <h3>Fields</h3>
             </div>
             <div class="items-list">
                 ${items.map(item => {
                     return html`
                         <div class="item">
-                            <input class="name-input" value="${item.text}" @input="${function(e) {
+                            <input title="Title" class="name-input" value="${item.text}" @input="${function(e) {
                                 item.text = this.value;
                                 saveState();
                                 self.render();
                             }}"/>
-                            <gyro-fluid-input class="factor-input" min="0" max="50" suffix="%" value="${item.factor}" steps="0.001" @change="${function(e) {
-                                if(self.getFactorSum() > 100) {
-                                    item.factor = this.value - (self.getFactorSum() - 100);
-                                    this.setValue(item.factor);
-                                } else {
-                                    item.factor = this.value;
-                                    saveState();
-                                    self.render();
-                                }
-                            }}"></gyro-fluid-input>
+                            <gyro-fluid-input 
+                                title="Probability" 
+                                class="factor-input" 
+                                min="0" max="50" 
+                                suffix="%" 
+                                value="${item.factor}" 
+                                steps="0.001" 
+                                @change="${function(e) {
+                                    if(self.getFactorSum() > 100) {
+                                        item.factor = this.value - (self.getFactorSum() - 100);
+                                        this.setValue(item.factor);
+                                    } else {
+                                        item.factor = this.value;
+                                        saveState();
+                                        self.render();
+                                    }}}">
+                            </gyro-fluid-input>
                             <button class="del-btn" @click="${() => {
                                 const index = globalState.items.indexOf(item);
                                 globalState.items.splice(index, 1);
                                 saveState();
                                 this.render();
-                            }}">-</button>
+                            }}">
+                                <span class="material-icons" title="Delete">delete_outline</span>
+                            </button>
                         </div>
                     `;
                 })}
             </div>
             <div class="item sum">
-                <span>Probability sum:</span>
+                <a>Probability sum:</a>
                 <span data="${globalState.items.length}">
                     ${this.getFactorSum().toFixed(2)}%
                 </span>
@@ -204,7 +225,9 @@ class ItemsEditor extends HTMLElement {
 
                     const listElem = this.shadowRoot.querySelector('.items-list');
                     listElem.scrollTo(0, listElem.scrollHeight);
-                }}">+</button>
+                }}">
+                    <span class="material-icons">add</span>
+                </button>
             </div>
         `;
     }

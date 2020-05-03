@@ -18,7 +18,7 @@ main {
 
 item-editor {
     backdrop-filter: blur(18px);
-    background: rgba(50, 50, 50, 0.8);
+    background: hsla(0, 0%, 15%, 0.8);
 }
 
 .drawer {

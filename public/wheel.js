@@ -108,19 +108,6 @@ function generateWheelImage(names = []) {
 
 function turnWheel(wheel, itemsState, updateCallback = () => {}) {
 
-    const selectionArray = new Array(100);
-    let currentIndex = 0;
-
-    for(let item of itemsState.items) {
-        const cellAmount = +item.factor;
-
-        for(let i = 0; i < cellAmount; i++) {
-            selectionArray[currentIndex + i] = item;
-        }
-
-        currentIndex += cellAmount;
-    }
-
     const startTime = Date.now();
     const tickrate = 1000 / 144;
 
@@ -176,14 +163,19 @@ function turnWheel(wheel, itemsState, updateCallback = () => {}) {
         state.velocity *= 1 - drag;
 
         const items = itemsState.items;
-        const itemsCount = 100;
 
         const wheelFraction = state.angle / 360;
-        const itemFraction = wheelFraction * 100;
+        const itemFraction = (wheelFraction * 100) % 100; // 0 - 100
 
-        const itemIndex = Math.floor(itemFraction + 1) % 100;
+        let target;
+        let factorSum = 0;
 
-        const target = selectionArray[itemIndex];
+        for(let item of itemsState.items) {
+            if(factorSum <= itemFraction) {
+                factorSum += +item.factor;
+                target = item;
+            }
+        }
 
         if(state.target != target) {
             state.target = target;
@@ -194,7 +186,7 @@ function turnWheel(wheel, itemsState, updateCallback = () => {}) {
 
     const draw = () => {
         if(wheel) {
-            wheel.style.transform = `rotate(${state.angle - 86}deg)`;
+            wheel.style.transform = `rotate(${state.angle - 90}deg)`;
         }
     }
 

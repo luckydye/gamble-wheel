@@ -21,7 +21,8 @@ function generateWheelImage(names = []) {
     const backgroundColor = "white";
     const centerColor = "white";
 
-    const font = "16px Roboto, Arial";
+    const fontSize = 16;
+    const font = "Roboto, Arial";
 
     const canvas = document.createElement('canvas');
     const context = canvas.getContext("2d");
@@ -31,7 +32,6 @@ function generateWheelImage(names = []) {
 
     const center = [width / 2, height / 2];
 
-    context.font = font;
     context.textBaseline = "middle";
     context.textAlign = "right";
 
@@ -76,6 +76,10 @@ function generateWheelImage(names = []) {
 
         context.stroke();
         context.fill();
+
+        const fieldSize = Math.min(a - angleOffset, 0.3) + 0.7;
+
+        context.font = `${fontSize * fieldSize}px ${font}`;
 
         const textAngle = angleOffset + angel - (angel / 2);
 

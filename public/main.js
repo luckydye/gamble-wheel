@@ -152,15 +152,13 @@ function winnerAnimation(winner) {
     const particles = [];
     let lastTick = performance.now();
     let deltaTime = 0;
+    let accumulator = 0;
+    const tickrate = 1000 / 144;
 
-    const updateCanvas = (ms = 0) => {
-        const currentTick = performance.now();
-        const delta = currentTick - lastTick;
-        deltaTime += delta;
-
+    const drawCanvas = () => {
         ctx.clearRect(0, 0, cvs.width, cvs.height);
 
-        ctx.globalAlpha = 0.7;
+        ctx.globalAlpha = 0.8;
 
         let alife = 0;
         let freeze = false;
@@ -168,8 +166,6 @@ function winnerAnimation(winner) {
         for(let particle of particles) {
 
             freeze = particle.freeze;
-
-            ctx.save();
 
             ctx.translate(particle.x, particle.y);
             ctx.rotate(particle.rotation);
@@ -183,7 +179,11 @@ function winnerAnimation(winner) {
                 ctx.fillRect(-(size/2), -(size/2), size, size);
             }
 
-            ctx.restore();
+            ctx.resetTransform();
+
+            particle.velocity[0] *= 0.995;
+            particle.velocity[1] += 0.001 * particle.size;
+            particle.velocity[2] *= 0.995;
 
             particle.x += particle.velocity[0];
             particle.y += particle.velocity[1];
@@ -192,14 +192,26 @@ function winnerAnimation(winner) {
             if(particle.y < cvs.height + 5) {
                 alife += 1;
             }
-
-            particle.velocity[0] *= 0.995;
-            particle.velocity[1] += 0.0009 * particle.size;
-            particle.velocity[2] *= 0.995;
         }
 
-        if(alife > 0) {
+        return alife;
+    }
 
+    const updateCanvas = (ms = 0) => {
+        const currentTick = performance.now();
+        const delta = currentTick - lastTick;
+        deltaTime += delta;
+
+        let alife;
+
+        accumulator += delta;
+
+        while(accumulator >= tickrate) {
+            alife = drawCanvas();
+            accumulator -= tickrate;
+        }
+
+        if(alife == undefined || alife > 0) {
             if(freeze && deltaTime > 1000) {
                 setTimeout(() => {
                     ctx.clearRect(0, 0, cvs.width, cvs.height);
@@ -220,11 +232,11 @@ function winnerAnimation(winner) {
         freeze = 1;
     }
     
-    for(let i = 0; i < 500; i++) {
+    for(let i = 0; i < 150; i++) {
         const a = Math.random() * (Math.PI * 2);
 
         let image;
-        if(winner.text.toLocaleLowerCase().match('emote') && Math.random() > 0.5) {
+        if(winner.text.toLocaleLowerCase().match('emote')) {
             image = emotes[Math.floor(Math.random() * emotes.length)]
         }
 

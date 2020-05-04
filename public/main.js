@@ -49,117 +49,6 @@ loadSave();
 
 // main
 
-async function fetchAllEmotes() {
-    const url = `https://api.frankerfacez.com/v1/room/lirik`;
-    const json = await fetch(url).then(res => res.json());
-
-    const emoteAsImages = [];
-
-    const emoticons = json.sets[Object.keys(json.sets)[0]].emoticons;
-
-    for(let emote of emoticons) {
-        const img = new Image();
-        img.onload = () => {
-            emoteAsImages.push(img);
-        }
-        img.src = emote.urls[1];
-    }
-
-    return emoteAsImages;
-}
-
-let emotes = [];
-
-fetchAllEmotes().then(emoteList => {
-    emotes = emoteList;
-});
-
-function winnerAnimation(winner) {
-    const cvs = document.querySelector('.animated-background');
-    const ctx = cvs.getContext("2d");
-
-    cvs.width = window.innerWidth;
-    cvs.height = window.innerHeight;
-
-    const particles = [];
-    let lastTick = performance.now();
-    let deltaTime = 0;
-
-    const updateCanvas = (ms = 0) => {
-        const currentTick = performance.now();
-        const delta = currentTick - lastTick;
-        deltaTime += delta;
-
-        ctx.clearRect(0, 0, cvs.width, cvs.height);
-
-        ctx.globalAlpha = 0.7;
-
-        let alife = 0;
-
-        for(let particle of particles) {
-
-            ctx.save();
-
-            ctx.translate(particle.x, particle.y);
-            ctx.rotate(particle.rotation);
-
-            if(particle.image) {
-                const size = particle.size;
-                ctx.drawImage(particle.image, -(size/2), -(size/2), size, size);
-            } else {
-                ctx.fillStyle = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
-                const size = particle.size / 5;
-                ctx.fillRect(-(size/2), -(size/2), size, size);
-            }
-
-            ctx.restore();
-
-            particle.x += particle.velocity[0];
-            particle.y += particle.velocity[1];
-            particle.rotation += particle.velocity[2];
-
-            if(particle.y < cvs.height + 5) {
-                alife += 1;
-            }
-
-            particle.velocity[0] *= 0.995;
-            particle.velocity[1] += 0.0009 * particle.size;
-            particle.velocity[2] *= 0.995;
-        }
-
-        if(alife > 0) {
-            requestAnimationFrame(updateCanvas);
-        } else {
-            ctx.clearRect(0, 0, cvs.width, cvs.height);
-        }
-
-        lastTick = currentTick;
-    }
-    
-    for(let i = 0; i < 500; i++) {
-        const a = Math.random() * (Math.PI * 2);
-
-        let image;
-        if(winner.text.toLocaleLowerCase().match('emote') && Math.random() > 0.5) {
-            image = emotes[Math.floor(Math.random() * emotes.length)]
-        }
-
-        particles.push({ 
-            image: image,
-            x: cvs.width / 2,
-            y: cvs.height / 2, 
-            rotation: Math.random() * (Math.PI * 2),
-            size: Math.random() * 20 + 20,
-            velocity: [
-                Math.sin(a) * (Math.random() * 7),
-                Math.cos(a) * (Math.random() * 3) - 4,
-                Math.random() * 0.01 + 0.05,
-            ]
-        });
-    }
-    updateCanvas();
-}
-
 window.addEventListener('DOMContentLoaded', () => {
     const wheel = document.querySelector('gamble-wheel');
     const drawerHandle = document.querySelector('.drawer-handle');
@@ -171,7 +60,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 wheel.style.animation = "";
             }
         }
-        winnerAnimation(e.winner);
     });
 
     drawerHandle.addEventListener('click', () => {

@@ -117,93 +117,6 @@ function generateWheelImage(names = []) {
     return canvas;
 }
 
-function turnWheel(wheel, itemsState, updateCallback = () => {}) {
-
-    const startTime = Date.now();
-    const tickrate = 1000 / 144;
-
-    // 3.6 = one rotation
-    const minVelocity = 3.6 * 2;
-    const drag = 0.0065;
-
-    const state = {
-        angle: 0,
-        velocity: Math.random() * 36 + minVelocity,
-        target: itemsState.items[0],
-        winner: null,
-    }
-
-    console.log('energy:', state.velocity);
-
-    let lastFrame, accumulator = 0;
-
-    const animate = () => {
-        
-        const currentFrame = performance.now();
-
-        if(lastFrame) {
-            let delta = currentFrame - lastFrame;
-
-            if(accumulator == 0) {
-                delta = tickrate;
-            }
-            
-            accumulator += delta;
-            
-            while (accumulator > tickrate) {
-                accumulator -= tickrate;
-                update();
-            }
-        }
-
-        lastFrame = currentFrame;
-
-        draw();
-
-        if(state.velocity > 0.01) {
-            requestAnimationFrame(animate);
-        } else {
-            state.winner = state.target;
-            updateCallback(state);
-            console.log('time', Date.now() - startTime);
-        }
-    }
-
-    const update = () => {
-        state.angle += state.velocity;
-        state.velocity *= 1 - drag;
-
-        const items = itemsState.items;
-
-        const wheelFraction = state.angle / 360;
-        const itemFraction = (wheelFraction * 100) % 100; // 0 - 100
-
-        let target;
-        let factorSum = 0;
-
-        for(let item of itemsState.items) {
-            if(factorSum <= itemFraction) {
-                factorSum += +item.factor;
-                target = item;
-            }
-        }
-
-        if(state.target != target) {
-            state.target = target;
-
-            updateCallback(state);
-        }
-    }
-
-    const draw = () => {
-        if(wheel) {
-            wheel.style.transform = `rotate(${state.angle - 90.125}deg)`;
-        }
-    }
-
-    animate();
-}
-
 class WheelWinnerEvent extends Event {
     constructor(winner) {
         super('finished');
@@ -224,39 +137,129 @@ class GambleWheel extends HTMLElement {
         this.turning = false;
 
         window.addEventListener('state.save', () => {
-            this.setWheel();
+            this.resetWheel();
         });
 
         window.addEventListener('state.load', () => {
-            this.setWheel();
+            this.resetWheel();
         });
     }
 
-    setWheel() {
+    draw(state) {
+        if(this.wheel) {
+            this.wheel.style.transform = `rotate(${state.angle - 90.125}deg)`;
+        }
+    }
+
+    update(state) {
+        if(state.target) {
+            this.display.innerText = state.target.text;
+        }
+
+        if(state.winner) {
+            this.turning = false;
+            console.log('winner', state.winner);
+            this.showWinner(state.winner);
+
+            this.dispatchEvent(new WheelWinnerEvent(state.winner));
+        }
+    }
+
+    turnWheel(itemsState) {
+        return new Promise((resolve, reject) => {
+    
+            const startTime = Date.now();
+            const tickrate = 1000 / 144;
+    
+            // 3.6 = one rotation
+            const drag = 0.9935;
+            const minVelocity = (1.35 + drag) * 3;
+    
+            const state = {
+                angle: 0,
+                velocity: Math.random() * 36 + minVelocity,
+                target: itemsState.items[0],
+                winner: null,
+            }
+    
+            console.log('energy:', state.velocity);
+    
+            let lastFrame, accumulator = 0;
+    
+            const animate = () => {
+                
+                const currentFrame = performance.now();
+    
+                if(lastFrame) {
+                    let delta = currentFrame - lastFrame;
+    
+                    if(accumulator == 0) {
+                        delta = tickrate;
+                    }
+                    
+                    accumulator += delta;
+                    
+                    while (accumulator > tickrate) {
+                        accumulator -= tickrate;
+                        update();
+                    }
+                }
+    
+                this.draw(state);
+    
+                lastFrame = currentFrame;
+    
+                if(state.velocity > 0.01) {
+                    requestAnimationFrame(animate);
+                } else {
+                    state.winner = state.target;
+                    this.update(state);
+                    console.log('time', Date.now() - startTime);
+                    resolve(state);
+                }
+            }
+    
+            const update = () => {
+                state.angle += state.velocity;
+                state.velocity *= drag;
+    
+                const items = itemsState.items;
+    
+                const wheelFraction = state.angle / 360;
+                const itemFraction = (wheelFraction * 100) % 100; // 0 - 100
+    
+                let target;
+                let factorSum = 0;
+    
+                for(let item of itemsState.items) {
+                    if(factorSum <= itemFraction) {
+                        factorSum += +item.factor;
+                        target = item;
+                    }
+                }
+    
+                if(state.target != target) {
+                    state.target = target;
+    
+                    this.update(state);
+                }
+            }
+    
+            animate();
+        })
+    }
+
+    resetWheel() {
         this.wheel = generateWheelImage(globalState.items);
 
         const wheel = this.shadowRoot.querySelector('.wheel');
 
-        wheel.addEventListener('click', () => {
+        wheel.onclick = () => {
             if(!this.turning) {
                 this.turning = true;
-
-                turnWheel(this.wheel, globalState, (state) => {
-            
-                    if(state.target) {
-                        this.display.innerText = state.target.text;
-                    }
-        
-                    if(state.winner) {
-                        this.turning = false;
-                        console.log('winner', state.winner);
-                        this.showWinner(state.winner);
-
-                        this.dispatchEvent(new WheelWinnerEvent(state.winner));
-                    }
-                });
+                this.turnWheel(globalState);
             }
-        });
+        };
 
         this.render();
     }

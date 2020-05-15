@@ -74,7 +74,9 @@ item-editor {
     left: 50%;
     transform: translate(-50%, 0);
     font-size: 12px;
-    opacity: 0.25;
+    font-weight: 100;
+    font-family: 'Roboto', sans-serif;
+    opacity: 0.125;
 }
 
 .cp a[href] {

@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "binswheel"
+    "default": "binswheel",
+    "bubbly": "bubblywheel"
   }
 }

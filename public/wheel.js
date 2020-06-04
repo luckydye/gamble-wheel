@@ -5,15 +5,15 @@ image.src = "./logo.png";
 
 function generateWheelImage(names = []) {
 
-    const width = 600;
-    const height = 600;
+    const width = 560;
+    const height = 560;
 
-    const radius = 270;
+    const radius = 300;
     const centerRadius = 45;
-    const wheelBorder = 2;
-    const lineWidth = 2.5;
+    const wheelBorder = 0;
+    const lineWidth = 1;
 
-    const textOffset = 10;
+    const textOffset = 30;
     
     const textColor = "#eee";
     const borderColor = "white";
@@ -166,6 +166,8 @@ class GambleWheel extends HTMLElement {
     }
 
     turnWheel(itemsState) {
+        this.setAttribute('turning', '');
+
         return new Promise((resolve, reject) => {
     
             const startTime = Date.now();
@@ -303,18 +305,20 @@ class GambleWheel extends HTMLElement {
                     border-radius: 6px;
                     white-space: nowrap;
                     text-align: center;
+                    margin-bottom: 20px;
+                    z-index: 1000;
+                    position: relative;
                 }
                 .wheel {
                     position: relative;
-                    z-index: 100;
-                    overflow: hidden;
+                    z-index: 10;
                 }
                 .wheel::after {
                     content: "";
                     position: absolute;
                     z-index: 1000;
                     left: 50%;
-                    top: 3%;
+                    top: -10px;
                     height: 30px;
                     width: 4px;
                     background: white;
@@ -332,6 +336,18 @@ class GambleWheel extends HTMLElement {
                     position: relative;
                     z-index: -1;
                     width: 100%;
+                    border-radius: 50%;
+                    box-shadow: 0 2px 18px rgba(0, 0, 0, 0.5);
+                    
+                }
+
+                :host(:not([turning])) canvas {
+                    animation: 60s idle linear;
+                }
+
+                @keyframes idle {
+                    from { transform: rotate(0); }
+                    to { transform: rotate(-360deg); }
                 }
             </style>
             <div class="display">

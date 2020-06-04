@@ -55,7 +55,7 @@ function generateWheelImage(names = []) {
         let a = angleOffset + angel;
         
         context.strokeStyle = borderColor;
-        context.fillStyle = `hsl(${item.color}, 70%, 55%)`;
+        context.fillStyle = `hsl(${item.color}, 60%, 55%)`;
         context.lineWidth = lineWidth;
 
         context.beginPath();

@@ -24,12 +24,14 @@ item-editor {
 .drawer {
     position: fixed;
     right: 10px;
+    top: 50%;
     z-index: 1000;
     transition: transform .2s ease-out;
+    transform: translate(0, -50%);
 }
 
 .drawer:not([open]) {
-    transform: translate(100%, 0);
+    transform: translate(100%, -50%);
 }
 
 .drawer-handle {

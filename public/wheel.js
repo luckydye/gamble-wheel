@@ -5,15 +5,16 @@ image.src = "./logo.png";
 
 function generateWheelImage(names = []) {
 
-    const width = 560;
-    const height = 560;
+    const width = 650;
+    const height = 650;
 
-    const radius = 300;
-    const centerRadius = 45;
     const wheelBorder = 0;
-    const lineWidth = 1;
+    const centerImageBorder = 5;
+    const radius = (width / 2) - wheelBorder;
+    const centerRadius = radius / 100 * 20;
+    const lineWidth = 1.5;
 
-    const textOffset = 30;
+    const textOffset = 10;
     
     const textColor = "#eee";
     const borderColor = "white";
@@ -54,7 +55,7 @@ function generateWheelImage(names = []) {
         let a = angleOffset + angel;
         
         context.strokeStyle = borderColor;
-        context.fillStyle = `hsl(${item.color}, 50%, 50%)`;
+        context.fillStyle = `hsl(${item.color}, 70%, 55%)`;
         context.lineWidth = lineWidth;
 
         context.beginPath();
@@ -104,13 +105,24 @@ function generateWheelImage(names = []) {
 
     context.beginPath();
 
-    const centerImageSize = centerRadius * 2;
+    let centerImageSize = centerRadius * 2;
+
+    const drawimage = () => {
+
+        const x = center[0] - (centerImageSize / 2);
+        const y = center[1] - (centerImageSize / 2);
+
+        context.fillStyle = backgroundColor;
+        context.arc(center[0], center[1], centerImageSize / 2 + centerImageBorder, 0, Math.PI * 2);
+        context.fill();
+        context.drawImage(image, x, y, centerImageSize, centerImageSize);
+    }
 
     if(image.complete) {
-        context.drawImage(image, center[0] - (centerImageSize / 2), center[1] - (centerImageSize / 2), centerImageSize, centerImageSize);
+        drawimage();
     } else {
         image.onload = () => {
-            context.drawImage(image, center[0] - (centerImageSize / 2), center[1] - (centerImageSize / 2), centerImageSize, centerImageSize);
+            drawimage();
         }
     }
 
@@ -301,7 +313,7 @@ class GambleWheel extends HTMLElement {
                     min-width: 300px;
                     padding: 0 10px;
                     line-height: 40px;
-                    background: #434343;
+                    /* background: #434343; */
                     border-radius: 6px;
                     white-space: nowrap;
                     text-align: center;
@@ -343,6 +355,7 @@ class GambleWheel extends HTMLElement {
 
                 :host(:not([turning])) canvas {
                     animation: 60s idle linear;
+                    animation-iteration-count: infinite;
                 }
 
                 @keyframes idle {

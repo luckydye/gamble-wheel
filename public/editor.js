@@ -237,10 +237,12 @@ class ItemsEditor extends HTMLElement {
                                 }}">
                             </gyro-fluid-input>
                             <button class="del-btn" @click="${() => {
-                                const index = this.currentSet.indexOf(item);
-                                this.currentSet.splice(index, 1);
-                                saveState();
-                                this.render();
+                                if(self.getFactorSum() <= 100) {
+                                    const index = this.currentSet.indexOf(item);
+                                    this.currentSet.splice(index, 1);
+                                    saveState();
+                                    this.render();
+                                }
                             }}">
                                 <span class="material-icons" title="Delete">delete_outline</span>
                             </button>

@@ -183,9 +183,6 @@ class ItemsEditor extends HTMLElement {
                 }
             </style>
             <div class="item header">
-                <h3>Fields (${this.currentSet.length})</h3>
-            </div>
-            <div class="item header">
                 <button @click="${() => {
                     name = prompt('Set name:');
                     if(name) {
@@ -213,6 +210,9 @@ class ItemsEditor extends HTMLElement {
                 }}">
                     <span class="material-icons" title="Delete">delete_outline</span>
                 </button>
+            </div>
+            <div class="item header">
+                <h3>Fields (${this.currentSet.length})</h3>
             </div>
             <div class="items-list">
                 ${items.map(item => {

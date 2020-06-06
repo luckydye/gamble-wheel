@@ -277,6 +277,11 @@ class ItemsEditor extends HTMLElement {
 
     render() {
         render(this.template(), this.shadowRoot);
+        
+        const select = this.shadowRoot.querySelector('#currentSet');
+        if(select) {
+            select.value = window.wheelSet;
+        }
     }
 
 }

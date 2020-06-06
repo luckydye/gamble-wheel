@@ -13,6 +13,10 @@ class ItemsEditor extends HTMLElement {
         });
     }
 
+    get currentSet() {
+        return globalState[window.wheelSet];
+    }
+
     connectedCallback() {
         if(window.globalState) {
             this.render();
@@ -20,14 +24,14 @@ class ItemsEditor extends HTMLElement {
     }
 
     getFactorSum() {
-        return globalState.items.reduce((accumulator, item) => {
+        return this.currentSet.reduce((accumulator, item) => {
             const factor = +item.factor;
             return accumulator + factor;
         }, 0);
     }
 
     template() {
-        const items = globalState.items;
+        const items = this.currentSet;
         const self = this;
 
         return html`
@@ -78,6 +82,13 @@ class ItemsEditor extends HTMLElement {
                     margin-right: -10px;
                 }
 
+                select {
+                    min-width: 200px;
+                    flex: 1;
+                    margin: 0 10px;
+                }
+
+                select,
                 input {
                     border: none;
                     outline: none;
@@ -89,6 +100,7 @@ class ItemsEditor extends HTMLElement {
                     width: auto;
                 }
 
+                select:focus,
                 input:focus {
                     background: #393939;
                 }
@@ -134,11 +146,15 @@ class ItemsEditor extends HTMLElement {
                     outline: none;
                 }
 
-                button:hover {
+                button[disabled] {
+                    opacity: 0.75;
+                }
+
+                button:not([disabled]):hover {
                     background: #393939;
                 }
 
-                button:active {
+                button:not([disabled]):active {
                     background: #2f2f2f;
                 }
 
@@ -167,7 +183,36 @@ class ItemsEditor extends HTMLElement {
                 }
             </style>
             <div class="item header">
-                <h3>Fields (${globalState.items.length})</h3>
+                <h3>Fields (${this.currentSet.length})</h3>
+            </div>
+            <div class="item header">
+                <button @click="${() => {
+                    name = prompt('Set name:');
+                    if(name) {
+                        window.createWheelSet(name);
+                        this.shadowRoot.querySelector('#currentSet').value = window.wheelSet;
+                        this.render();
+                    }
+                }}">
+                    <span class="material-icons" title="Add">add</span>
+                </button>
+
+                <select title="Wheel Set" id="currentSet" @change="${function(e) {
+                    window.setWheelSet(this.value);
+                }}">
+                    ${Object.keys(globalState).map(id => {
+                        return html`<option>${id}</option>`;
+                    })}
+                </select>
+
+                <button ?disabled="${Object.keys(globalState).length < 2}" @click="${() => {
+                    window.deleteWheelSet(window.wheelSet);
+                    this.shadowRoot.querySelector('#currentSet').value = window.wheelSet;
+                    window.saveState();
+                    this.render();
+                }}">
+                    <span class="material-icons" title="Delete">delete_outline</span>
+                </button>
             </div>
             <div class="items-list">
                 ${items.map(item => {
@@ -181,23 +226,19 @@ class ItemsEditor extends HTMLElement {
                             <gyro-fluid-input 
                                 title="Probability" 
                                 class="factor-input" 
-                                min="0" max="100" 
+                                min="0" max="${100 - (self.getFactorSum() - (+item.factor))}" 
                                 suffix="%" 
-                                value="${item.factor}" 
+                                .value="${item.factor}" 
                                 steps="0.001" 
                                 @change="${function(e) {
-                                    if(self.getFactorSum() > 100) {
-                                        item.factor = this.value - (self.getFactorSum() - 100);
-                                        this.setValue(item.factor);
-                                    } else {
-                                        item.factor = this.value;
-                                        saveState();
-                                        self.render();
-                                    }}}">
+                                    item.factor = this.value;
+                                    saveState();
+                                    self.render();
+                                }}">
                             </gyro-fluid-input>
                             <button class="del-btn" @click="${() => {
-                                const index = globalState.items.indexOf(item);
-                                globalState.items.splice(index, 1);
+                                const index = this.currentSet.indexOf(item);
+                                this.currentSet.splice(index, 1);
                                 saveState();
                                 this.render();
                             }}">
@@ -209,17 +250,17 @@ class ItemsEditor extends HTMLElement {
             </div>
             <div class="item sum">
                 <a>Probability sum:</a>
-                <span data="${globalState.items.length}">
+                <span data="${this.currentSet.length}">
                     ${this.getFactorSum().toFixed(2)}%
                 </span>
             </div>
             <div class="item">
                 <button class="add-btn" @click="${() => {
-                    if(globalState.items.length > 200) {
+                    if(this.currentSet.length > 200) {
                         return;
                     }
 
-                    globalState.items.push({ text: "Empty", factor: 0, color: Math.random() * 255 });
+                    this.currentSet.push({ text: "Empty", factor: 0, color: Math.random() * 255 });
                     saveState();
                     this.render();
 

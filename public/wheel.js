@@ -177,7 +177,7 @@ class GambleWheel extends HTMLElement {
         }
     }
 
-    turnWheel(itemsState) {
+    turnWheel(itemSet) {
         this.setAttribute('turning', '');
 
         return new Promise((resolve, reject) => {
@@ -192,7 +192,7 @@ class GambleWheel extends HTMLElement {
             const state = {
                 angle: 0,
                 velocity: Math.random() * 36 + minVelocity,
-                target: itemsState.items[0],
+                target: itemSet[0],
                 winner: null,
             }
     
@@ -237,7 +237,7 @@ class GambleWheel extends HTMLElement {
                 state.angle += state.velocity;
                 state.velocity *= drag;
     
-                const items = itemsState.items;
+                const items = itemSet;
     
                 const wheelFraction = state.angle / 360;
                 const itemFraction = (wheelFraction * 100) % 100; // 0 - 100
@@ -245,7 +245,7 @@ class GambleWheel extends HTMLElement {
                 let target;
                 let factorSum = 0;
     
-                for(let item of itemsState.items) {
+                for(let item of itemSet) {
                     if(factorSum <= itemFraction) {
                         factorSum += +item.factor;
                         target = item;
@@ -264,14 +264,14 @@ class GambleWheel extends HTMLElement {
     }
 
     resetWheel() {
-        this.wheel = generateWheelImage(globalState.items);
+        this.wheel = generateWheelImage(globalState[window.wheelSet]);
 
         const wheel = this.shadowRoot.querySelector('.wheel');
 
         wheel.onclick = () => {
             if(!this.turning) {
                 this.turning = true;
-                this.turnWheel(globalState);
+                this.turnWheel(globalState[window.wheelSet]);
             }
         };
 

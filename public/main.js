@@ -4,7 +4,7 @@ import './wheel.js';
 // state mngmnt
 
 window.globalState = window.globalState || {
-    "items": [
+    "Set 1": [
         {
             "text": "꽣",
             "factor": "30",
@@ -78,12 +78,19 @@ window.globalState = window.globalState || {
     ]
 }
 
+window.wheelSet = "Set 1";
+
 window.loadSave = function loadSave() {
     const state = localStorage.getItem('wheel-state');
     if(state) {
         globalState = JSON.parse(state);
         console.log('state loaded');
     }
+
+    if(!globalState[window.wheelSet]) {
+        window.wheelSet = Object.keys(globalState)[Object.keys(globalState).length-1];
+    }
+
     window.dispatchEvent(new Event('state.load'));
     return globalState;
 }
@@ -93,6 +100,30 @@ window.saveState = function saveState() {
     // console.log('state saved');
     window.dispatchEvent(new Event('state.save'));
     return true;
+}
+
+window.setWheelSet = function(value) {
+    window.wheelSet = value;
+    window.dispatchEvent(new Event('state.load'));
+}
+
+window.createWheelSet = function(name) {
+    window.wheelSet = name;
+    globalState[window.wheelSet] = [
+        {
+            "text": "Nothing",
+            "factor": "100",
+            "color": Math.random() * 255
+        }
+    ];
+    window.saveState();
+    window.dispatchEvent(new Event('state.load'));
+    return globalState[name];
+}
+
+window.deleteWheelSet = function(name) {
+    delete globalState[name];
+    window.wheelSet = Object.keys(globalState)[Object.keys(globalState).length-1];
 }
 
 loadSave();

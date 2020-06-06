@@ -185,7 +185,7 @@ class ItemsEditor extends HTMLElement {
             <div class="item header">
                 <button @click="${() => {
                     name = prompt('Set name:');
-                    if(name) {
+                    if(name && name !== "null") {
                         window.createWheelSet(name);
                         this.shadowRoot.querySelector('#currentSet').value = window.wheelSet;
                         this.render();
